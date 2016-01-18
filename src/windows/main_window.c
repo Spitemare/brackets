@@ -91,29 +91,29 @@ static void window_load(Window *window) {
   Layer *root_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(root_layer);
 
-  int y_margin = 59;
-  GRect frame = grect_inset(bounds, GEdgeInsets(y_margin, 0));
+  int origin = PBL_IF_ROUND_ELSE(59, 49);
+  GRect frame = grect_inset(bounds, GEdgeInsets(origin, -10, 0, -10));
   s_bg_layer = make_text_layer(frame, FontSizeLarge);
   text_layer_set_text(s_bg_layer, "[    ]");
   layer_add_child(root_layer, text_layer_get_layer(s_bg_layer));
 
-  y_margin = 60;
-  frame = grect_inset(bounds, GEdgeInsets(y_margin, 0));
+  origin += 1;
+  frame = grect_inset(bounds, GEdgeInsets(origin, 0));
   s_date_layer = make_text_layer(frame, FontSizeMedium);
   layer_add_child(root_layer, text_layer_get_layer(s_date_layer));
 
-  y_margin = 88;
-  frame = grect_inset(bounds, GEdgeInsets(y_margin, 0, 0, 0));
+  origin += 28;
+  frame = grect_inset(bounds, GEdgeInsets(origin, 0, 0, 0));
   s_time_layer = make_text_layer(frame, FontSizeMedium);
   layer_add_child(root_layer, text_layer_get_layer(s_time_layer));
 
-  y_margin = 140;
-  frame = grect_inset(bounds, GEdgeInsets(y_margin, 0, 0, 0));
+  origin += 52;
+  frame = grect_inset(bounds, GEdgeInsets(origin, 0, 0, 0));
   s_battery_layer = make_text_layer(frame, FontSizeSmall);
   layer_add_child(root_layer, text_layer_get_layer(s_battery_layer));
 
-  y_margin = 128;
-  s_dashes_layer = layer_create(grect_inset(bounds, GEdgeInsets(y_margin, 0, 0, 0)));
+  origin -= PBL_IF_ROUND_ELSE(12, 10);
+  s_dashes_layer = layer_create(grect_inset(bounds, GEdgeInsets(origin, 0, 0, 0)));
   layer_set_update_proc(s_dashes_layer, dashes_update_proc);
   layer_add_child(root_layer, s_dashes_layer);
 }
