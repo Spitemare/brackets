@@ -6,6 +6,7 @@ typedef enum {
   FontSizeLarge
 } FontSize;
 
+static GFont s_fonts[3];
 static Window *s_window;
 static TextLayer *s_bg_layer, *s_date_layer, *s_time_layer, *s_battery_layer;
 static Layer *s_dashes_layer;
@@ -78,12 +79,20 @@ static int get_resource_id(FontSize size) {
   }
 }
 
+static GFont get_font(FontSize size) {
+    GFont font = s_fonts[size];
+    if (!font) {
+        font = fonts_load_custom_font(resource_get_handle(get_resource_id(size)));
+        s_fonts[size] = font;
+    }
+    return font;
+}
+
 static TextLayer* make_text_layer(GRect frame, FontSize size) {
   TextLayer *this = text_layer_create(frame);
   text_layer_set_text_alignment(this, GTextAlignmentCenter);
   text_layer_set_background_color(this, GColorClear);
-  text_layer_set_font(this, 
-    fonts_load_custom_font(resource_get_handle(get_resource_id(size))));
+  text_layer_set_font(this, get_font(size));
   return this;
 }
 
@@ -125,6 +134,9 @@ static void window_unload(Window *window) {
   text_layer_destroy(s_battery_layer);
 
   layer_destroy(s_dashes_layer);
+
+  for (size_t i = 0; i < ARRAY_LENGTH(s_fonts); i++)
+    fonts_unload_custom_font(s_fonts[i]);
 
   window_destroy(s_window);
   s_window = NULL;
