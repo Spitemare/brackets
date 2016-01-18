@@ -1,0 +1,31 @@
+{
+  "uuid": "1BD648E8-786A-479C-8609-E2F87F5B706E",
+  "shortName": "Brackets",
+  "longName": "Brackets",
+  "companyName": "Chris Lewis",
+  "versionLabel": "1.0",
+  "sdkVersion": "3",
+  "targetPlatforms": ["aplite", "basalt", "chalk"],
+  "watchapp": {
+    "watchface": true
+  },
+  "resources": {
+    "media": [
+      {
+        "type": "font",
+        "name": "SHARE_20",
+        "file": "fonts/Share-TechMono.ttf"
+      },
+      {
+        "type": "font",
+        "name": "SHARE_24",
+        "file": "fonts/Share-TechMono.ttf"
+      },
+      {
+        "type": "font",
+        "name": "SHARE_47",
+        "file": "fonts/Share-TechMono.ttf"
+      }
+    ]
+  }
+}
