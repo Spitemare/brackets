@@ -29,17 +29,20 @@
       {
         "type": "font",
         "name": "SHARE_20",
-        "file": "fonts/Share-TechMono.ttf"
+        "file": "fonts/Share-TechMono.ttf",
+        "characterRegex" : "[0-9%]"
       },
       {
         "type": "font",
         "name": "SHARE_24",
-        "file": "fonts/Share-TechMono.ttf"
+        "file": "fonts/Share-TechMono.ttf",
+        "characterRegex" : "[0-9A-GJ-PR-VY :]"
       },
       {
         "type": "font",
         "name": "SHARE_47",
-        "file": "fonts/Share-TechMono.ttf"
+        "file": "fonts/Share-TechMono.ttf",
+        "characterRegex" : "[ \\[\\]]"
       }
     ]
   }
