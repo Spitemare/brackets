@@ -49,7 +49,7 @@ static char* get_caps_month(int month) {
     case 8: return "SEP";
     case 9: return "OCT";
     case 10: return "NOV";
-    case 11: return "DEV";
+    case 11: return "DEC";
     default: return "UNK";
   }
 }
