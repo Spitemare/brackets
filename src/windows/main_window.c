@@ -62,7 +62,7 @@ static void tick_handler(struct tm *tick_time, TimeUnits changed) {
 
   // Time
   static char time_buffer[16];
-  strftime(time_buffer, sizeof(time_buffer), "%H:%M:%S", tick_time);
+  strftime(time_buffer, sizeof(time_buffer), clock_is_24h_style() ? "%H:%M:%S" : "%I:%M:%S", tick_time);
   text_layer_set_text(s_time_layer, time_buffer);
 }
 
