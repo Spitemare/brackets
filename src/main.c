@@ -1,8 +1,12 @@
 #include <pebble.h>
 
+#include "modules/data.h"
+
 #include "windows/main_window.h"
 
 static void init() {
+  data_init();
+
   main_window_push();
 }
 

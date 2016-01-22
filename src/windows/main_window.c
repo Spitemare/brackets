@@ -16,14 +16,14 @@ static void dashes_update_proc(Layer *layer, GContext *ctx) {
   const int line_height = 2;
 
   // Draw line
-  graphics_context_set_fill_color(ctx, GColorDarkGray);
+  graphics_context_set_fill_color(ctx, data_get_color(AppKeyLineColor));
   graphics_fill_rect(ctx, GRect(0, 0, bounds.size.w, line_height), 0 , GCornerNone);
 
   // Cut dashes
   const int num_dashes = 9;
   const int dash_width = 18;
   const int dash_gap = 2;
-  graphics_context_set_fill_color(ctx, GColorWhite);
+  graphics_context_set_fill_color(ctx, data_get_color(AppKeyBackgroundColor));
   for(int i = 0; i < num_dashes; i++) {
     GRect rect = GRect((5 * dash_gap) + (i * dash_width), 0, dash_gap, line_height);
     graphics_fill_rect(ctx, rect, 0, GCornerNone);
@@ -88,8 +88,9 @@ static GFont get_font(FontSize size) {
     return font;
 }
 
-static TextLayer* make_text_layer(GRect frame, FontSize size) {
+static TextLayer* make_text_layer(GRect frame, FontSize size, GColor text_color) {
   TextLayer *this = text_layer_create(frame);
+  text_layer_set_text_color(this, text_color);
   text_layer_set_text_alignment(this, GTextAlignmentCenter);
   text_layer_set_background_color(this, GColorClear);
   text_layer_set_font(this, get_font(size));
@@ -102,23 +103,23 @@ static void window_load(Window *window) {
 
   int origin = PBL_IF_ROUND_ELSE(59, 49);
   GRect frame = grect_inset(bounds, GEdgeInsets(origin, -10, 0, -10));
-  s_bg_layer = make_text_layer(frame, FontSizeLarge);
+  s_bg_layer = make_text_layer(frame, FontSizeLarge, data_get_color(AppKeyBracketColor));
   text_layer_set_text(s_bg_layer, "[    ]");
   layer_add_child(root_layer, text_layer_get_layer(s_bg_layer));
 
   origin += 1;
   frame = grect_inset(bounds, GEdgeInsets(origin, 0));
-  s_date_layer = make_text_layer(frame, FontSizeMedium);
+  s_date_layer = make_text_layer(frame, FontSizeMedium, data_get_color(AppKeyDateColor));
   layer_add_child(root_layer, text_layer_get_layer(s_date_layer));
 
   origin += 28;
   frame = grect_inset(bounds, GEdgeInsets(origin, 0, 0, 0));
-  s_time_layer = make_text_layer(frame, FontSizeMedium);
+  s_time_layer = make_text_layer(frame, FontSizeMedium, data_get_color(AppKeyTimeColor));
   layer_add_child(root_layer, text_layer_get_layer(s_time_layer));
 
   origin += 52;
   frame = grect_inset(bounds, GEdgeInsets(origin, 0, 0, 0));
-  s_battery_layer = make_text_layer(frame, FontSizeSmall);
+  s_battery_layer = make_text_layer(frame, FontSizeSmall, data_get_color(AppKeyComplicationColor));
   layer_add_child(root_layer, text_layer_get_layer(s_battery_layer));
 
   origin -= PBL_IF_ROUND_ELSE(12, 10);
@@ -145,6 +146,7 @@ static void window_unload(Window *window) {
 void main_window_push() {
   if(!s_window) {
     s_window = window_create();
+    window_set_background_color(s_window, data_get_color(AppKeyBackgroundColor));
     window_set_window_handlers(s_window, (WindowHandlers) {
       .load = window_load,
       .unload = window_unload,

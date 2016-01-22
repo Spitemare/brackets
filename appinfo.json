@@ -9,6 +9,18 @@
   "watchapp": {
     "watchface": true
   },
+  "appKeys": {
+    "AppKeyBatteryIndicator": 0,
+    "AppKeyBluetoothAlert": 1,
+    "AppKeyDashedLine": 2,
+    "AppKeySecondTick": 3,
+    "AppKeyBackgroundColor": 4,
+    "AppKeyDateColor": 5,
+    "AppKeyTimeColor": 6,
+    "AppKeyBracketColor": 7,
+    "AppKeyLineColor": 8,
+    "AppKeyComplicationColor": 9
+  },
   "resources": {
     "media": [
       {
