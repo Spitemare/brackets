@@ -2,8 +2,11 @@
 
 #include <pebble.h>
 
+#define DATA_NUM_BOOLEANS 4
+#define DATA_NUM_COLORS   6
+
 typedef enum {
-  AppKeyBatteryIndicator = 0,
+  AppKeyBatteryMeter = 0,
   AppKeyBluetoothAlert,
   AppKeyDashedLine,
   AppKeySecondTick,

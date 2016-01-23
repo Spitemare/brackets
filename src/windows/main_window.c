@@ -8,7 +8,7 @@ typedef enum {
 
 static GFont s_fonts[3];
 static Window *s_window;
-static TextLayer *s_bg_layer, *s_date_layer, *s_time_layer, *s_battery_layer;
+static TextLayer *s_brackets_layer, *s_date_layer, *s_time_layer, *s_battery_layer;
 static Layer *s_dashes_layer;
 
 static void dashes_update_proc(Layer *layer, GContext *ctx) {
@@ -63,7 +63,11 @@ static void tick_handler(struct tm *tick_time, TimeUnits changed) {
 
   // Time
   static char time_buffer[16];
-  strftime(time_buffer, sizeof(time_buffer), clock_is_24h_style() ? "%H:%M:%S" : "%I:%M:%S", tick_time);
+  if(data_get_boolean(AppKeySecondTick)) {
+    strftime(time_buffer, sizeof(time_buffer), clock_is_24h_style() ? "%H:%M:%S" : "%I:%M:%S", tick_time);
+  } else {
+    strftime(time_buffer, sizeof(time_buffer), clock_is_24h_style() ? " %H:%M" : " %I:%M", tick_time);
+  }
   text_layer_set_text(s_time_layer, time_buffer);
 }
 
@@ -81,16 +85,15 @@ static int get_resource_id(FontSize size) {
 
 static GFont get_font(FontSize size) {
     GFont font = s_fonts[size];
-    if (!font) {
+    if(!font) {
         font = fonts_load_custom_font(resource_get_handle(get_resource_id(size)));
         s_fonts[size] = font;
     }
     return font;
 }
 
-static TextLayer* make_text_layer(GRect frame, FontSize size, GColor text_color) {
+static TextLayer* make_text_layer(GRect frame, FontSize size) {
   TextLayer *this = text_layer_create(frame);
-  text_layer_set_text_color(this, text_color);
   text_layer_set_text_alignment(this, GTextAlignmentCenter);
   text_layer_set_background_color(this, GColorClear);
   text_layer_set_font(this, get_font(size));
@@ -103,23 +106,23 @@ static void window_load(Window *window) {
 
   int origin = PBL_IF_ROUND_ELSE(59, 49);
   GRect frame = grect_inset(bounds, GEdgeInsets(origin, -10, 0, -10));
-  s_bg_layer = make_text_layer(frame, FontSizeLarge, data_get_color(AppKeyBracketColor));
-  text_layer_set_text(s_bg_layer, "[    ]");
-  layer_add_child(root_layer, text_layer_get_layer(s_bg_layer));
+  s_brackets_layer = make_text_layer(frame, FontSizeLarge);
+  text_layer_set_text(s_brackets_layer, "[    ]");
+  layer_add_child(root_layer, text_layer_get_layer(s_brackets_layer));
 
   origin += 1;
   frame = grect_inset(bounds, GEdgeInsets(origin, 0));
-  s_date_layer = make_text_layer(frame, FontSizeMedium, data_get_color(AppKeyDateColor));
+  s_date_layer = make_text_layer(frame, FontSizeMedium);
   layer_add_child(root_layer, text_layer_get_layer(s_date_layer));
 
   origin += 28;
   frame = grect_inset(bounds, GEdgeInsets(origin, 0, 0, 0));
-  s_time_layer = make_text_layer(frame, FontSizeMedium, data_get_color(AppKeyTimeColor));
+  s_time_layer = make_text_layer(frame, FontSizeMedium);
   layer_add_child(root_layer, text_layer_get_layer(s_time_layer));
 
   origin += 52;
   frame = grect_inset(bounds, GEdgeInsets(origin, 0, 0, 0));
-  s_battery_layer = make_text_layer(frame, FontSizeSmall, data_get_color(AppKeyComplicationColor));
+  s_battery_layer = make_text_layer(frame, FontSizeSmall);
   layer_add_child(root_layer, text_layer_get_layer(s_battery_layer));
 
   origin -= PBL_IF_ROUND_ELSE(12, 10);
@@ -129,7 +132,7 @@ static void window_load(Window *window) {
 }
 
 static void window_unload(Window *window) {
-  text_layer_destroy(s_bg_layer);
+  text_layer_destroy(s_brackets_layer);
   text_layer_destroy(s_date_layer);
   text_layer_destroy(s_time_layer);
   text_layer_destroy(s_battery_layer);
@@ -146,7 +149,6 @@ static void window_unload(Window *window) {
 void main_window_push() {
   if(!s_window) {
     s_window = window_create();
-    window_set_background_color(s_window, data_get_color(AppKeyBackgroundColor));
     window_set_window_handlers(s_window, (WindowHandlers) {
       .load = window_load,
       .unload = window_unload,
@@ -154,8 +156,23 @@ void main_window_push() {
   }
   window_stack_push(s_window, true);
 
-  tick_timer_service_subscribe(SECOND_UNIT, tick_handler);
   battery_state_service_subscribe(batt_handler);
-
   batt_handler(battery_state_service_peek());
+
+  main_window_reload();
+}
+
+void main_window_reload() {
+  layer_set_hidden(text_layer_get_layer(s_battery_layer), !data_get_boolean(AppKeyBatteryMeter));
+  // BT indicator
+  layer_set_hidden(s_dashes_layer, !data_get_boolean(AppKeyDashedLine));
+  tick_timer_service_unsubscribe();
+  tick_timer_service_subscribe(data_get_boolean(AppKeySecondTick) ? SECOND_UNIT : MINUTE_UNIT, tick_handler);
+
+  window_set_background_color(s_window, data_get_color(AppKeyBackgroundColor));
+  text_layer_set_text_color(s_brackets_layer, data_get_color(AppKeyBracketColor));
+  text_layer_set_text_color(s_date_layer, data_get_color(AppKeyDateColor));
+  text_layer_set_text_color(s_time_layer, data_get_color(AppKeyTimeColor));
+  // BT color
+  text_layer_set_text_color(s_battery_layer, data_get_color(AppKeyComplicationColor));
 }

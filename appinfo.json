@@ -3,12 +3,15 @@
   "shortName": "Brackets",
   "longName": "Brackets",
   "companyName": "Chris Lewis",
-  "versionLabel": "1.1",
+  "versionLabel": "1.2",
   "sdkVersion": "3",
   "targetPlatforms": ["aplite", "basalt", "chalk"],
   "watchapp": {
     "watchface": true
   },
+  "capabilities": [
+    "configurable"
+  ],
   "appKeys": {
     "AppKeyBatteryIndicator": 0,
     "AppKeyBluetoothAlert": 1,
