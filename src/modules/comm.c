@@ -20,6 +20,7 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
         case AppKeyLineColor:
         case AppKeyComplicationColor:
           data_set_color(key, (GColor){ .argb = t->value->int32 });
+          printf("%d got %d", key, (int)t->value->int32);
           break;
       }
     }

@@ -9,7 +9,12 @@ typedef enum {
 static GFont s_fonts[3];
 static Window *s_window;
 static TextLayer *s_brackets_layer, *s_date_layer, *s_time_layer, *s_battery_layer;
-static Layer *s_dashes_layer;
+static Layer *s_dashes_layer, *s_bt_layer;
+
+static void bt_update_proc(Layer *layer, GContext *ctx) {
+  graphics_context_set_fill_color(ctx, data_get_color(AppKeyBackgroundColor));
+  graphics_fill_rect(ctx, layer_get_bounds(layer), 0 , GCornerNone);
+}
 
 static void dashes_update_proc(Layer *layer, GContext *ctx) {
   GRect bounds = layer_get_bounds(layer);
@@ -27,6 +32,14 @@ static void dashes_update_proc(Layer *layer, GContext *ctx) {
   for(int i = 0; i < num_dashes; i++) {
     GRect rect = GRect((5 * dash_gap) + (i * dash_width), 0, dash_gap, line_height);
     graphics_fill_rect(ctx, rect, 0, GCornerNone);
+  }
+}
+
+static void bt_handler(bool connected) {
+  layer_set_hidden(s_bt_layer, connected);
+
+  if(!connected) {
+    vibes_double_pulse();
   }
 }
 
@@ -129,6 +142,12 @@ static void window_load(Window *window) {
   s_dashes_layer = layer_create(grect_inset(bounds, GEdgeInsets(origin, 0, 0, 0)));
   layer_set_update_proc(s_dashes_layer, dashes_update_proc);
   layer_add_child(root_layer, s_dashes_layer);
+
+  const int gap = 5;
+  const int y_margin = (bounds.size.h - gap) / 2;
+  s_bt_layer = layer_create(grect_inset(bounds, GEdgeInsets(y_margin, 0)));
+  layer_set_update_proc(s_bt_layer, bt_update_proc);
+  layer_add_child(root_layer, s_bt_layer);
 }
 
 static void window_unload(Window *window) {
@@ -139,8 +158,9 @@ static void window_unload(Window *window) {
 
   layer_destroy(s_dashes_layer);
 
-  for (size_t i = 0; i < ARRAY_LENGTH(s_fonts); i++)
+  for (size_t i = 0; i < ARRAY_LENGTH(s_fonts); i++) {
     fonts_unload_custom_font(s_fonts[i]);
+  }
 
   window_destroy(s_window);
   s_window = NULL;
@@ -168,8 +188,18 @@ void main_window_push() {
 
 void main_window_reload() {
   layer_set_hidden(text_layer_get_layer(s_battery_layer), !data_get_boolean(AppKeyBatteryMeter));
-  // BT indicator
+
+  layer_set_hidden(s_bt_layer, !data_get_boolean(AppKeyBluetoothAlert));
+  connection_service_unsubscribe();
+  if(data_get_boolean(AppKeyBluetoothAlert)) {
+    connection_service_subscribe((ConnectionHandlers) {
+      .pebble_app_connection_handler = bt_handler
+    });
+    bt_handler(connection_service_peek_pebble_app_connection());
+  }
+
   layer_set_hidden(s_dashes_layer, !data_get_boolean(AppKeyDashedLine));
+
   tick_timer_service_unsubscribe();
   tick_timer_service_subscribe(data_get_boolean(AppKeySecondTick) ? SECOND_UNIT : MINUTE_UNIT, tick_handler);
 
@@ -177,6 +207,5 @@ void main_window_reload() {
   text_layer_set_text_color(s_brackets_layer, data_get_color(AppKeyBracketColor));
   text_layer_set_text_color(s_date_layer, data_get_color(AppKeyDateColor));
   text_layer_set_text_color(s_time_layer, data_get_color(AppKeyTimeColor));
-  // BT color
   text_layer_set_text_color(s_battery_layer, data_get_color(AppKeyComplicationColor));
 }
