@@ -66,7 +66,7 @@ static void tick_handler(struct tm *tick_time, TimeUnits changed) {
   if(data_get_boolean(AppKeySecondTick)) {
     strftime(time_buffer, sizeof(time_buffer), clock_is_24h_style() ? "%H:%M:%S" : "%I:%M:%S", tick_time);
   } else {
-    strftime(time_buffer, sizeof(time_buffer), clock_is_24h_style() ? " %H:%M" : " %I:%M", tick_time);
+    strftime(time_buffer, sizeof(time_buffer), clock_is_24h_style() ? "%H:%M   " : "%I:%M   ", tick_time);
   }
   text_layer_set_text(s_time_layer, time_buffer);
 }
@@ -155,6 +155,10 @@ void main_window_push() {
     });
   }
   window_stack_push(s_window, true);
+
+  time_t now = time(NULL);
+  struct tm *tick_now = localtime(&now);
+  tick_handler(tick_now, SECOND_UNIT);
 
   battery_state_service_subscribe(batt_handler);
   batt_handler(battery_state_service_peek());

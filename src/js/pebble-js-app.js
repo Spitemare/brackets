@@ -26,10 +26,10 @@ Pebble.addEventListener('webviewclosed', function(e) {
   var json = JSON.parse(decodeURIComponent(e.response));
 
   Pebble.sendAppMessage({
-    'AppKeyBatteryMeter': toBoolInt(json.check_battery_meter),
-    'AppKeyBluetoothAlert': toBoolInt(json.check_bluetooth_alerts),
-    'AppKeyDashedLine': toBoolInt(json.check_dashed_line),
-    'AppKeySecondTick': toBoolInt(json.check_second_tick),
+    'AppKeyBatteryMeter': '' + json.check_battery_meter,
+    'AppKeyBluetoothAlert': '' + json.check_bluetooth_alerts,
+    'AppKeyDashedLine': '' + json.check_dashed_line,
+    'AppKeySecondTick': '' + json.check_second_tick,
 
     'AppKeyBackgroundColor': GColorFromHex(json.text_background_color),
     'AppKeyDateColor': GColorFromHex(json.text_date_color),

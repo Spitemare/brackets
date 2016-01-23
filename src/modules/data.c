@@ -54,7 +54,7 @@ bool data_get_boolean(int key) {
 
 void data_set_color(int key, GColor color) {
   s_colors[color_key(key)] = color;
-  persist_write_int(color_key(key), color.argb);
+  persist_write_int(key, color.argb);
 }
 
 GColor data_get_color(int key) {

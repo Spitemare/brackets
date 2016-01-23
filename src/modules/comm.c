@@ -10,7 +10,7 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
         case AppKeyBluetoothAlert:
         case AppKeyDashedLine:
         case AppKeySecondTick:
-          data_set_boolean(key, t->value->int32 == 1);
+          data_set_boolean(key, strcmp(t->value->cstring, "true") == 0);
           break;
 
         case AppKeyBackgroundColor:

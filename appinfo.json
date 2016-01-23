@@ -13,7 +13,7 @@
     "configurable"
   ],
   "appKeys": {
-    "AppKeyBatteryIndicator": 0,
+    "AppKeyBatteryMeter": 0,
     "AppKeyBluetoothAlert": 1,
     "AppKeyDashedLine": 2,
     "AppKeySecondTick": 3,
